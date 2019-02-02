@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 #=================================================
-#	System Required: CentOS 6+/Debian 6+/Ubuntu 14.04+
+#	System Required: CentOS 6+/Debian 6+/Ubuntu 18.04+
 #	Description: Install the Trojan server
 #	Version: 0.0.1
 #	Author: novice
@@ -17,7 +17,7 @@ sysctl -p
 
 # Install Trojan
 apt --fix-broken -y install python-pycurl python-apt
-add-apt-repository ppa:greaterfire/trojan
+add-apt-repository -y ppa:greaterfire/trojan
 apt update
 apt -y install trojan
 
@@ -96,3 +96,5 @@ WantedBy=multi-user.target" > /etc/systemd/system/trojan.service
 
 #Start Trojan Service
 systemctl start trojan
+echo -e "Trojan Installation Complete!"
+
