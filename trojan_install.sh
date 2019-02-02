@@ -23,7 +23,7 @@ apt -y install trojan
 
 # Create Certificate
 apt -y install gnutls-bin gnutls-doc
-echo && read -e -p "请输入服务器IP地址: " IP
+echo && read -e -p "请输入服务器IP地址或网址: " IP
 echo -e "cn = \"$IP\"
 organization = \"Trojan\"
 serial = 1
