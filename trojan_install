@@ -9,7 +9,6 @@ export PATH
 #	Author: novice
 #=================================================
 
-
 check_root(){
 	[[ $EUID != 0 ]] && echo -e "${Error} 当前账号非ROOT(或没有ROOT权限)，无法继续操作，请使用${Green_background_prefix} sudo su ${Font_color_suffix}来获取临时ROOT权限（执行后会提示输入当前账号的密码）。" && exit 1
 }
@@ -45,5 +44,21 @@ apt install trojan
 
 # Create Certificate
 apt install gnutls-bin gnutls-doc
-echo "#CA Template" > /etc/ca-certificates/ca.tmpl
+echo -e "#CA Template\ncn = \"vps的IP地址\" \norganization = \"Trojan\"\nserial = 1 \nexpiration_days = 3650 \nca \nsigning_key \ncert_signing_key \ncrl_signing_key"
+
+# Creat CA Key
+cd /etc/ca-certificates
+certtool --generate-privkey --outfile ca-key.pem
+
+# Create CA Certificate
+certtool --generate-self-signed --load-privkey ca-key.pem --template ca.tmpl --outfile ca-cert.pem
+
+# Create Server Certificate Template
+echo -e "#Server CA Template\ncn = \"vps的IP地址\"\norganization = \"Trojan\"\nexpiration_days = 3650\nsigning_key\nencryption_key\ntls_www_server" > /etc/ca-certificates/server.tmpl
+
+# Create Sever Key
+certtool --generate-privkey --outfile server-key.pem
+
+# Create Server Certificate
+certtool --generate-certificate --load-privkey server-key.pem --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem --template server.tmpl --outfile server-cert.pem
 
