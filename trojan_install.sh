@@ -44,7 +44,7 @@ apt install trojan
 
 # Create Certificate
 apt install gnutls-bin gnutls-doc
-echo && read -e -p "请输入服务器IP地址" IP
+echo && read -e -p "请输入服务器IP地址: " IP
 echo -e "#CA Template\ncn = \"$IP\" \norganization = \"Trojan\"\nserial = 1 \nexpiration_days = 3650 \nca \nsigning_key \ncert_signing_key \ncrl_signing_key" >> /etc/ca-certificates/ca.tmpl
 
 # Creat CA Key
@@ -64,7 +64,7 @@ certtool --generate-privkey --outfile server-key.pem
 certtool --generate-certificate --load-privkey server-key.pem --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem --template server.tmpl --outfile server-cert.pem
 
 # Server Config
-echo && read -e -p "请设置密码" passwd
+echo && read -e -p "请设置密码: " passwd
 echo -e "{
     \"run_type\": \"server\",
     \"local_addr\": \"0.0.0.0\",
@@ -93,8 +93,7 @@ echo -e "{
 }" > /etc/trojan/config.json
 
 #Create Trojan Service
-echo -e
-"[Unit]
+echo -e "[Unit]
 After=network.target 
 
 [Service]
