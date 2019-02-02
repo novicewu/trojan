@@ -9,27 +9,6 @@ export PATH
 #	Author: novice
 #=================================================
 
-check_root(){
-	[[ $EUID != 0 ]] && echo -e "${Error} 当前账号非ROOT(或没有ROOT权限)，无法继续操作，请使用${Green_background_prefix} sudo su ${Font_color_suffix}来获取临时ROOT权限（执行后会提示输入当前账号的密码）。" && exit 1
-}
-check_sys(){
-	if [[ -f /etc/redhat-release ]]; then
-		release="centos"
-	elif cat /etc/issue | grep -q -E -i "debian"; then
-		release="debian"
-	elif cat /etc/issue | grep -q -E -i "ubuntu"; then
-		release="ubuntu"
-	elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
-		release="centos"
-	elif cat /proc/version | grep -q -E -i "debian"; then
-		release="debian"
-	elif cat /proc/version | grep -q -E -i "ubuntu"; then
-		release="ubuntu"
-	elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
-		release="centos"
-    fi
-	bit=`uname -m`
-}
 
 # Modify System Variables
 echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
@@ -37,15 +16,22 @@ echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
 sysctl -p
 
 # Install Trojan
-apt --fix-broken install python-pycurl python-apt
+apt --fix-broken -y install python-pycurl python-apt
 add-apt-repository ppa:greaterfire/trojan
 apt update
-apt install trojan
+apt -y install trojan
 
 # Create Certificate
-apt install gnutls-bin gnutls-doc
+apt -y install gnutls-bin gnutls-doc
 echo && read -e -p "请输入服务器IP地址: " IP
-echo -e "#CA Template\ncn = \"$IP\" \norganization = \"Trojan\"\nserial = 1 \nexpiration_days = 3650 \nca \nsigning_key \ncert_signing_key \ncrl_signing_key" >> /etc/ca-certificates/ca.tmpl
+echo -e "cn = \"$IP\"
+organization = \"Trojan\"
+serial = 1
+expiration_days = 3650
+ca
+signing_key
+cert_signing_key
+crl_signing_key" >/etc/ca-certificates/ca.tmpl
 
 # Creat CA Key
 cd /etc/ca-certificates
@@ -55,7 +41,12 @@ certtool --generate-privkey --outfile ca-key.pem
 certtool --generate-self-signed --load-privkey ca-key.pem --template ca.tmpl --outfile ca-cert.pem
 
 # Create Server Certificate Template
-echo -e "#Server CA Template\ncn = \"$IP\"\norganization = \"Trojan\"\nexpiration_days = 3650\nsigning_key\nencryption_key\ntls_www_server" > /etc/ca-certificates/server.tmpl
+echo -e "cn = \"$IP\"
+organization = \"Trojan\"
+expiration_days = 3650
+signing_key
+encryption_key
+tls_www_server" >/etc/ca-certificates/server.tmpl
 
 # Create Sever Key
 certtool --generate-privkey --outfile server-key.pem
