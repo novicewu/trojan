@@ -5,7 +5,7 @@ export PATH
 #=================================================
 #	System Required: CentOS 6+/Debian 6+/Ubuntu 18.04+
 #	Description: Install the Trojan server
-#	Version: 0.0.1
+#	Version: 1.0.1
 #	Author: novice
 #=================================================
 
