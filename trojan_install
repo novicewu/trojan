@@ -90,5 +90,19 @@ echo -e "{
          \"sigalgs\": \"\",
         \"dhparam\": \"\"
        }
-}" >> /etc/trojan/config.json
+}" > /etc/trojan/config.json
 
+#Create Trojan Service
+echo -e
+"[Unit]
+After=network.target 
+
+[Service]
+ExecStart=/usr/bin/trojan /etc/trojan/config.json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target" > /etc/systemd/system/trojan.service
+
+#Start Trojan Service
+systemctl start trojan
